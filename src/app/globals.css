@@ -1,43 +1,45 @@
 @import "tailwindcss";
 
 :root {
-  --background: oklch(0.08 0.02 280);
-  --foreground: oklch(0.94 0.02 60);
+  --background: hsl(20 14% 4%);
+  --foreground: hsl(30 20% 95%);
 
-  --card: oklch(0.12 0.02 280);
-  --card-foreground: oklch(0.94 0.02 60);
+  --card: hsl(20 10% 8%);
+  --card-foreground: hsl(30 20% 95%);
 
-  --popover: oklch(0.12 0.02 280);
-  --popover-foreground: oklch(0.94 0.02 60);
+  --popover: hsl(20 10% 8%);
+  --popover-foreground: hsl(30 20% 95%);
 
-  --primary: oklch(0.62 0.22 30);
-  --primary-foreground: oklch(0.08 0.02 280);
+  --primary: hsl(25 95% 53%);
+  --primary-foreground: 20 14% 4%;
 
-  --secondary: oklch(0.18 0.02 280);
-  --secondary-foreground: oklch(0.94 0.02 60);
+  --secondary: hsl(20 10% 15%);
+  --secondary-foreground: hsl(30 20% 95%);
 
-  --muted: oklch(0.18 0.02 280);
-  --muted-foreground: oklch(0.55 0.04 60);
+  --muted: hsl(20 10% 15%);
+  --muted-foreground: hsl(30 10% 55%);
 
-  --accent: oklch(0.68 0.21 60);
-  --accent-foreground: oklch(0.08 0.02 280);
+  --accent: hsl(38 92% 50%);
+  --accent-foreground: 20 14% 4%;
 
-  --destructive: oklch(0.55 0.24 25);
-  --destructive-foreground: oklch(0.94 0.02 60);
+  --destructive: hsl(0 72% 51%);
+  --destructive-foreground: hsl(30 20% 95%);
 
-  --success: oklch(0.55 0.15 140);
-  --success-foreground: oklch(0.94 0.02 60);
+  --success: hsl(142 76% 36%);
+  --success-foreground: hsl(30 20% 95%);
 
-  --border: oklch(0.2 0.02 280);
-  --input: oklch(0.2 0.02 280);
-  --ring: oklch(0.62 0.22 30);
+  --border: hsl(20 10% 20%);
+  --input: hsl(20 10% 20%);
+  --ring: hsl(25 95% 53%);
 
   --radius: 0.75rem;
 
-  --phoenix-red: oklch(0.55 0.24 25);
-  --phoenix-orange: oklch(0.62 0.22 30);
-  --phoenix-gold: oklch(0.68 0.21 60);
-  --phoenix-ember: oklch(0.52 0.18 35);
+  --phoenix-red: hsl(0 78% 52%);
+  --phoenix-orange: hsl(25 95% 53%);
+  --phoenix-gold: hsl(38 92% 50%);
+  --phoenix-ember: hsl(15 85% 45%);
+
+  --radius: 0.75rem;
 
   --gradient-phoenix: linear-gradient(
     135deg,
