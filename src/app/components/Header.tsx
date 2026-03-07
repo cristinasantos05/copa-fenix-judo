@@ -121,7 +121,7 @@ export default function Header() {
       <aside
         className={`
           fixed left-0 top-0 z-50 h-full w-[80%] max-w-xs
-          bg-neutral-900/70
+          bg-neutral-900
           transform transition-transform duration-300
           ${open ? "translate-x-0" : "-translate-x-full"}
         `}
@@ -296,7 +296,7 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-2 px-4 pb-4">
-            <div className="relative flex-1">
+            <div className="relative flex-1 min-w-0">
               <CopaSelect
                 options={[
                   { value: "copa-fenix-2026", label: "Copa Fênix 2026" },
@@ -311,6 +311,7 @@ export default function Header() {
 
             <Button
               className="
+                shrink-0
                 border border-white/10
                 rounded-xl
                 text-foreground
@@ -321,7 +322,7 @@ export default function Header() {
               <Plus />
             </Button>
 
-            <Button className="rounded-xl">
+            <Button className="shrink-0 rounded-xl">
               <Trash2 size={16} className="text-red-500" />
             </Button>
           </div>

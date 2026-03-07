@@ -2,6 +2,7 @@
 import { Swords, Trophy, Users, Medal } from "lucide-react";
 import Header from "./components/Header";
 import ModelCard from "./components/ModelCard";
+import TeamsSection from "./components/TeamsSection";
 
 export default function Home() {
   return (
@@ -36,6 +37,7 @@ export default function Home() {
           />
         </div>
       </section>
+      <TeamsSection />
     </>
   );
 }
