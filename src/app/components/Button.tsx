@@ -2,13 +2,20 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   noBg?: boolean;
 };
 
-function Button({ children, className = "", noBg, ...props }: ButtonProps) {
-  const base = noBg
-    ? "cursor-pointer flex items-center gap-2 rounded-md p-2"
-    : "cursor-pointer flex items-center gap-2 bg-transparent hover:bg-white/10 active:bg-white/15 rounded-md p-2";
-
+function Button({
+  children,
+  className = "",
+  noBg = false,
+  ...props
+}: ButtonProps) {
   return (
-    <button className={`${base} ${className}`} {...props}>
+    <button
+      className={`cursor-pointer flex items-center gap-2 rounded-md p-2 transition 
+      ${noBg}
+        ?""
+        : "bg-transparent hover:bg-white/10 active:bg-white/15"}${className}`}
+      {...props}
+    >
       {children}
     </button>
   );

@@ -23,7 +23,7 @@ export default function CopaSelect({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [openUp, setOpenUp] = useState(false);
-  const [internal, setInternal] = useState<string | undefined>(
+  const [selectedValue, setSelectedValue] = useState<string | undefined>(
     value ?? defaultValue ?? options[0]?.value,
   );
   const ref = useRef<HTMLDivElement | null>(null);
@@ -39,11 +39,11 @@ export default function CopaSelect({
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  const currentValue = value ?? internal;
+  const currentValue = value ?? selectedValue;
   const selected = options.find((o) => o.value === currentValue) ?? options[0];
 
   function handleSelect(v: string) {
-    if (value === undefined) setInternal(v);
+    if (value === undefined) setSelectedValue(v);
     onChange?.(v);
     setOpen(false);
   }
