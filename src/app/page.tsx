@@ -1,10 +1,41 @@
 "use client";
+import { Swords, Trophy, Users, Medal } from "lucide-react";
 import Header from "./components/Header";
+import ModelCard from "./components/ModelCard";
 
 export default function Home() {
   return (
     <>
       <Header />
+      <section className="px-6 py-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <ModelCard
+            icon={<Users className="text-orange-400" />}
+            value="0M / 0F"
+            label="Equipes"
+            highlight
+          />
+
+          <ModelCard
+            icon={<Swords className="text-white/70" />}
+            value="0"
+            label="Atletas"
+          />
+
+          <ModelCard
+            icon={<Trophy className="text-white/70" />}
+            value="0"
+            label="Confrontos"
+          />
+
+          <ModelCard
+            icon={<Medal className="text-orange-400" />}
+            value="0"
+            label="Certificados"
+            highlight
+          />
+        </div>
+      </section>
     </>
   );
 }
