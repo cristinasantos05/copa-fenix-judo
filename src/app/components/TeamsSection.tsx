@@ -59,8 +59,13 @@ export default function TeamsSection() {
           </Button>
         </div>
       </div>
-      <div className="border border-dashed rounded-xl border-white/30 roudend-xl py-12 text-center text-white/60 bg-neutral-900/30">
-        Nenhuma equipe cadastrada. Adicione a primeira equipe!
+      <div className="border border-dashed rounded-xl border-white/30 py-12 text-center text-white/60 bg-neutral-900/30">
+        {filter === "todos" &&
+          "Nenhuma equipe cadastrada. Adicione a primeira equipe!"}
+
+        {filter === "masc" && "Nenhuma equipe masculina cadastrada."}
+
+        {filter === "fem" && "Nenhuma equipe feminina cadastrada."}
       </div>
     </section>
   );

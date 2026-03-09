@@ -3,11 +3,18 @@ import { Swords, Trophy, Users, Medal } from "lucide-react";
 import Header from "./components/Header";
 import ModelCard from "./components/ModelCard";
 import TeamsSection from "./components/TeamsSection";
+import { useState } from "react";
+import CertificatesSection from "./components/CertificatesSection";
+import KeysSection from "./components/KeysSection";
 
 export default function Home() {
+  const [activeMenu, setActiveMenu] = useState<
+    "equipes" | "chaves" | "certificados"
+  >("equipes");
+
   return (
     <>
-      <Header />
+      <Header activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
       <section className="px-6 py-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <ModelCard
@@ -37,7 +44,9 @@ export default function Home() {
           />
         </div>
       </section>
-      <TeamsSection />
+      {activeMenu === "equipes" && <TeamsSection />}
+      {activeMenu === "certificados" && <CertificatesSection />}
+      {activeMenu === "chaves" && <KeysSection />}
     </>
   );
 }

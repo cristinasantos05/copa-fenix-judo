@@ -14,11 +14,13 @@ import Button from "./Button";
 import CopaSelect from "./CopaSelect";
 import { useState } from "react";
 
-export default function Header() {
+type HeaderProps = {
+  activeMenu: "equipes" | "chaves" | "certificados";
+  setActiveMenu: (menu: "equipes" | "chaves" | "certificados") => void;
+};
+
+export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
   const [open, setOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState<
-    "equipes" | "chaves" | "certificados"
-  >("equipes");
   const [selectedCopa, setSelectedCopa] = useState<string>("copa-fenix-2025");
 
   return (
