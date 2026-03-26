@@ -10,6 +10,13 @@ import {
   Trash2,
   Trophy,
 } from "lucide-react";
+import {
+  Show,
+  UserButton,
+  SignInButton,
+  SignUpButton,
+  SignOutButton,
+} from "@clerk/nextjs";
 import Button from "./Button";
 import CopaSelect from "./CopaSelect";
 import { useState } from "react";
@@ -49,6 +56,31 @@ export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
                 </span>
               </div>
             </div>
+          </div>
+
+          <div className="lg:hidden flex items-center gap-2">
+            <Show when="signed-in">
+              <div className="flex items-center gap-2">
+                <UserButton />
+                <SignOutButton redirectUrl="/">
+                  <button className="rounded-lg bg-red-500 px-2 py-1 text-sm text-white cursor-pointer">
+                    Sair
+                  </button>
+                </SignOutButton>
+              </div>
+            </Show>
+            <Show when="signed-out">
+              <SignInButton>
+                <button className="rounded-lg bg-orange-500 hover:bg-orange-600 px-2 py-1 text-sm text-white cursor-pointer">
+                  Entrar
+                </button>
+              </SignInButton>
+              <SignUpButton>
+                <button className="rounded-lg border border-white/20 hover:bg-white/10 px-2 py-1 text-sm text-white cursor-pointer">
+                  Cadastrar
+                </button>
+              </SignUpButton>
+            </Show>
           </div>
 
           <nav className="hidden lg:flex items-center gap-4">
@@ -109,6 +141,26 @@ export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
               <Button className="min-h-10 px-4 rounded-xl flex items-center justify-center">
                 <Trash2 size={17} className="text-red-500" />
               </Button>
+
+              <Show when="signed-in">
+                <div className="flex items-center gap-3 pl-7 border-l border-white/20 ml-2">
+                  <UserButton />
+                </div>
+              </Show>
+              <Show when="signed-out">
+                <div className="flex items-center gap-2 pl-7 border-l border-white/20 ml-2">
+                  <SignInButton>
+                    <button className="rounded-lg bg-orange-500 hover:bg-orange-600 px-2 py-1 text-sm text-white cursor-pointer">
+                      Entrar
+                    </button>
+                  </SignInButton>
+                  <SignUpButton>
+                    <button className="rounded-lg border border-white/20 hover:bg-white/10 px-2 py-1 text-sm text-white cursor-pointer">
+                      Cadastrar
+                    </button>
+                  </SignUpButton>
+                </div>
+              </Show>
             </div>
           </nav>
         </div>

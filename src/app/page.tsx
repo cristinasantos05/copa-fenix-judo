@@ -1,11 +1,11 @@
 "use client";
 import { Swords, Trophy, Users, Medal } from "lucide-react";
-import Header from "./components/Header";
-import ModelCard from "./components/ModelCard";
-import TeamsSection from "./components/TeamsSection";
+import Header from "./_components/Header";
+import ModelCard from "./_components/ModelCard";
+import TeamsSection from "./_components/TeamsSection";
 import { useState } from "react";
-import CertificatesSection from "./components/CertificatesSection";
-import KeysSection from "./components/KeysSection";
+import CertificatesSection from "./_components/CertificatesSection";
+import KeysSection from "./_components/KeysSection";
 
 export default function Home() {
   const [activeMenu, setActiveMenu] = useState<
