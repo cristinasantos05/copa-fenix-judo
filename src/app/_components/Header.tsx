@@ -19,16 +19,35 @@ import {
 } from "@clerk/nextjs";
 import Button from "./Button";
 import CopaSelect from "./CopaSelect";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type HeaderProps = {
   activeMenu: "equipes" | "chaves" | "certificados";
   setActiveMenu: (menu: "equipes" | "chaves" | "certificados") => void;
 };
 
+type Cup = {
+  id: string;
+  name: string;
+  endDate: string;
+};
+
 export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
   const [open, setOpen] = useState(false);
-  const [selectedCopa, setSelectedCopa] = useState<string>("copa-fenix-2025");
+  const [selectedCopa, setSelectedCopa] = useState("");
+  const [cups, setCups] = useState<Cup[]>([]);
+
+  const selectedCup = cups.find((cup) => cup.name === selectedCopa);
+
+  useEffect(() => {
+    async function getCups() {
+      const response = await fetch("/api/cups");
+      const data = await response.json();
+      setCups(data.cups);
+    }
+    getCups();
+  }, []);
+  console.log(cups);
 
   return (
     <>
@@ -50,10 +69,14 @@ export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
                 <Flame size={25} className="text-black" />
               </div>
               <div className="leading-tight">
-                <p className="text-xl font-semibold">Copa Fênix 2026</p>
-                <span className="text-xs text-muted-foreground">
-                  01/05/2026
-                </span>
+                <p className="text-xl font-semibold">
+                  {selectedCup?.name ?? "Copa Fênix"}
+                </p>
+                {selectedCup ? (
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(selectedCup.endDate).toLocaleDateString("pt-BR")}
+                  </span>
+                ) : null}
               </div>
             </div>
           </div>
@@ -124,13 +147,13 @@ export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
                 </div>
 
                 <CopaSelect
-                  options={[
-                    { value: "copa-fenix-2026", label: "Copa Fênix 2026" },
-                    { value: "copa-fenix-2025", label: "Copa Fênix 2025" },
-                    { value: "copa-fenix-2024", label: "Copa Fênix 2024" },
-                  ]}
+                  options={cups.map((cup) => ({
+                    value: cup.name,
+                    label: cup.name,
+                  }))}
                   value={selectedCopa}
                   onChange={setSelectedCopa}
+                  placeholder=""
                   icon={<Trophy size={16} className="text-orange-400" />}
                 />
               </div>
@@ -352,13 +375,11 @@ export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
           <div className="flex items-center gap-2 px-4 pb-4">
             <div className="relative flex-1 min-w-0">
               <CopaSelect
-                options={[
-                  { value: "copa-fenix-2026", label: "Copa Fênix 2026" },
-                  { value: "copa-fenix-2025", label: "Copa Fênix 2025" },
-                  { value: "copa-fenix-2024", label: "Copa Fênix 2024" },
-                ]}
-                value={selectedCopa}
-                onChange={setSelectedCopa}
+                  options={cups.map((cup) => ({
+                    value: cup.name,
+                    label: cup.name,
+                  }))}
+                placeholder="Selecione uma copa"
                 icon={<Trophy size={14} className="text-amber-400" />}
               />
             </div>
