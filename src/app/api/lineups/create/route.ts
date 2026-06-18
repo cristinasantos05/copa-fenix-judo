@@ -1,15 +1,14 @@
 import { db } from "@/lib/db";
 import { createLineUpSchema } from "@/schemas/lineUp";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-
     const validation = createLineUpSchema.safeParse(body);
-
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid LineUp data",
           errors: z.treeifyError(validation.error),
@@ -19,22 +18,22 @@ export async function POST(req: Request) {
     }
 
     const { bracketId } = validation.data;
-
     const bracket = await db.bracket.findUnique({
       where: {
         id: bracketId,
       },
+      select: {
+        id: true,
+      },
     });
-
     if (!bracket) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Bracket not found",
         },
         { status: 404 },
       );
     }
-
     const lineUp = await db.lineUp.create({
       data: {
         bracketId,
@@ -44,8 +43,7 @@ export async function POST(req: Request) {
         athletes: true,
       },
     });
-
-    return Response.json(
+    return NextResponse.json(
       {
         message: "LineUp created successfully",
         lineUp,
@@ -54,8 +52,7 @@ export async function POST(req: Request) {
     );
   } catch (err) {
     console.error(err);
-
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Error creating LineUp",
       },

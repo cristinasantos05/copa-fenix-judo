@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { athleteSchema } from "@/schemas/athlete";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function POST(req: Request) {
@@ -8,7 +9,7 @@ export async function POST(req: Request) {
     const validation = athleteSchema.safeParse(body);
 
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid athlete data",
           errors: z.treeifyError(validation.error),
@@ -21,10 +22,13 @@ export async function POST(req: Request) {
       where: {
         id: validation.data.teamId,
       },
+      select: {
+        id: true,
+      },
     });
 
     if (!team) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Team not found",
         },
@@ -40,7 +44,7 @@ export async function POST(req: Request) {
     });
 
     if (existingAthlete) {
-      return Response.json(
+      return NextResponse.json(
         { message: "Athlete already exists" },
         { status: 409 },
       );
@@ -49,13 +53,13 @@ export async function POST(req: Request) {
     const athlete = await db.athlete.create({
       data: validation.data,
     });
-    return Response.json(
+    return NextResponse.json(
       { message: "Athlete created successfully", athlete },
       { status: 201 },
     );
   } catch (err) {
     console.error(err);
-    return Response.json(
+    return NextResponse.json(
       { message: "Error creating athlete" },
       { status: 500 },
     );

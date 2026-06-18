@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { NextResponse } from "next/server";
 
 export async function DELETE(req: Request) {
   try {
@@ -7,20 +8,26 @@ export async function DELETE(req: Request) {
       where: {
         id,
       },
+      select: {
+        id: true,
+      },
     });
     if (!bracket) {
-      return Response.json({ message: "Bracket not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Bracket not found" },
+        { status: 404 },
+      );
     }
     await db.bracket.delete({
       where: {
         id,
       },
     });
-    return Response.json({ message: "OK" });
+    return NextResponse.json({ message: "Bracket deleted successfully" });
   } catch (err) {
     console.error(err);
-    return Response.json(
-      { message: "Error fetching brackets" },
+    return NextResponse.json(
+      { message: "Error deleting bracket" },
       { status: 500 },
     );
   }

@@ -1,15 +1,14 @@
 import { db } from "@/lib/db";
 import { deleteJudoClubSchema } from "@/schemas/judoClub";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function DELETE(req: Request) {
   try {
     const body = await req.json();
-
     const validation = deleteJudoClubSchema.safeParse(body);
-
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid JudoClub data",
           errors: z.treeifyError(validation.error),
@@ -19,27 +18,29 @@ export async function DELETE(req: Request) {
     }
 
     const { id } = validation.data;
-
     const club = await db.judoClub.findUnique({
       where: {
         id,
       },
-      include: {
-        cups: true,
+      select: {
+        id: true,
+        cups: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
-
     if (!club) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "JudoClub not found",
         },
         { status: 404 },
       );
     }
-
     if (club.cups.length > 0) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Cannot delete a JudoClub associated with cups",
         },
@@ -51,15 +52,16 @@ export async function DELETE(req: Request) {
       where: {
         id,
       },
+      select: {
+        id: true,
+      },
     });
-
-    return Response.json({
+    return NextResponse.json({
       message: "JudoClub deleted successfully",
     });
   } catch (err) {
     console.error(err);
-
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Error deleting JudoClub",
       },

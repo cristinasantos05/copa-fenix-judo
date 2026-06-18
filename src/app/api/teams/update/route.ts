@@ -1,15 +1,15 @@
 import { db } from "@/lib/db";
 import { updateTeamSchema } from "@/schemas/teams";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
-
     const validation = updateTeamSchema.safeParse(body);
 
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid team data",
           errors: z.treeifyError(validation.error),
@@ -19,15 +19,16 @@ export async function PUT(req: Request) {
     }
 
     const { id, name, gender } = validation.data;
-
     const existingTeam = await db.team.findUnique({
       where: {
         id,
       },
+      select: {
+        id: true,
+      },
     });
-
     if (!existingTeam) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Team not found",
         },
@@ -44,9 +45,8 @@ export async function PUT(req: Request) {
         },
       },
     });
-
     if (teamWithSameData) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Another team with this name and gender already exists",
         },
@@ -70,15 +70,13 @@ export async function PUT(req: Request) {
         updatedAt: true,
       },
     });
-
-    return Response.json({
+    return NextResponse.json({
       message: "Team updated successfully",
       team: updatedTeam,
     });
   } catch (err) {
     console.error(err);
-
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Error updating team",
       },

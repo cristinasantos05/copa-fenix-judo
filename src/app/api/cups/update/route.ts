@@ -1,15 +1,14 @@
 import { db } from "@/lib/db";
 import { updateCupSchema } from "@/schemas/cup";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
-
     const validation = updateCupSchema.safeParse(body);
-
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid cup data",
           errors: z.treeifyError(validation.error),
@@ -19,15 +18,16 @@ export async function PUT(req: Request) {
     }
 
     const { id, name, startDate, endDate } = validation.data;
-
     const existingCup = await db.cup.findUnique({
       where: {
         id,
       },
+      select: {
+        id: true,
+      },
     });
-
     if (!existingCup) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Cup not found",
         },
@@ -42,9 +42,8 @@ export async function PUT(req: Request) {
         },
       },
     });
-
     if (cupWithSameName) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Another cup with this name already exists",
         },
@@ -54,9 +53,8 @@ export async function PUT(req: Request) {
 
     const parsedStartDate = new Date(startDate);
     const parsedEndDate = new Date(endDate);
-
     if (parsedEndDate < parsedStartDate) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "End date cannot be before start date",
         },
@@ -80,15 +78,13 @@ export async function PUT(req: Request) {
         endDate: true,
       },
     });
-
-    return Response.json({
+    return NextResponse.json({
       message: "Cup updated successfully",
       cup: updatedCup,
     });
   } catch (err) {
     console.error(err);
-
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Error updating cup",
       },

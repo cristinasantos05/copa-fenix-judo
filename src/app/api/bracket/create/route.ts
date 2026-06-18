@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { createBracketSchema } from "@/schemas/bracket";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function POST(req: Request) {
@@ -8,7 +9,7 @@ export async function POST(req: Request) {
     const validation = createBracketSchema.safeParse(body);
 
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid bracket data",
           errors: z.treeifyError(validation.error),
@@ -22,10 +23,13 @@ export async function POST(req: Request) {
       where: {
         id: cupId,
       },
+      select: {
+        id: true,
+      },
     });
 
     if (!cup) {
-      return Response.json({ message: "Cup not found" }, { status: 404 });
+      return NextResponse.json({ message: "Cup not found" }, { status: 404 });
     }
     const teams = await db.team.findMany({
       where: {
@@ -36,7 +40,7 @@ export async function POST(req: Request) {
     });
 
     if (teams.length !== teamIds.length) {
-      return Response.json(
+      return NextResponse.json(
         { message: "One or more teams not found" },
         { status: 404 },
       );
@@ -53,13 +57,13 @@ export async function POST(req: Request) {
         teams: true,
       },
     });
-    return Response.json(
+    return NextResponse.json(
       { message: "Bracket created successfully", bracket },
       { status: 201 },
     );
   } catch (err) {
     console.error(err);
-    return Response.json(
+    return NextResponse.json(
       { message: "Error creating bracket" },
       { status: 500 },
     );

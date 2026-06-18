@@ -1,15 +1,14 @@
 import { db } from "@/lib/db";
 import { updateUserSchema } from "@/schemas/users";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
-
     const validation = updateUserSchema.safeParse(body);
-
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid user data",
           errors: z.treeifyError(validation.error),
@@ -19,15 +18,16 @@ export async function PUT(req: Request) {
     }
 
     const { id, name, email, password } = validation.data;
-
     const existingUser = await db.user.findUnique({
       where: {
         id,
       },
+      select: {
+        id: true,
+      },
     });
-
     if (!existingUser) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "User not found",
         },
@@ -40,9 +40,8 @@ export async function PUT(req: Request) {
         email,
       },
     });
-
     if (userWithSameEmail && userWithSameEmail.id !== id) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Another user with this email already exists",
         },
@@ -67,15 +66,13 @@ export async function PUT(req: Request) {
         updatedAt: true,
       },
     });
-
-    return Response.json({
+    return NextResponse.json({
       message: "User updated successfully",
       user,
     });
   } catch (err) {
     console.error(err);
-
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Error updating user",
       },

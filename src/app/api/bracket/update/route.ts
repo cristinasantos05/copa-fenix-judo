@@ -1,15 +1,14 @@
 import { db } from "@/lib/db";
 import { updateBracketSchema } from "@/schemas/bracket";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
-
     const validation = updateBracketSchema.safeParse(body);
-
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid bracket data",
           errors: z.treeifyError(validation.error),
@@ -19,15 +18,16 @@ export async function PUT(req: Request) {
     }
 
     const { id, cupId } = validation.data;
-
     const bracket = await db.bracket.findUnique({
       where: {
         id,
       },
+      select: {
+        id: true,
+      },
     });
-
     if (!bracket) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Bracket not found",
         },
@@ -39,10 +39,12 @@ export async function PUT(req: Request) {
       where: {
         id: cupId,
       },
+      select: {
+        id: true,
+      },
     });
-
     if (!cup) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Cup not found",
         },
@@ -62,15 +64,13 @@ export async function PUT(req: Request) {
         teams: true,
       },
     });
-
-    return Response.json({
+    return NextResponse.json({
       message: "Bracket updated successfully",
       bracket: updatedBracket,
     });
   } catch (err) {
     console.error(err);
-
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Error updating bracket",
       },

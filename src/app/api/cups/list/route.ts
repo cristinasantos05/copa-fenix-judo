@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -17,9 +18,12 @@ export async function GET() {
         },
       },
     });
-    return Response.json({ message: "OK", cups });
+    return NextResponse.json({ message: "OK", cups });
   } catch (err) {
     console.error(err);
-    return Response.json({ message: "Error fetching cups" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Error fetching cups" },
+      { status: 500 },
+    );
   }
 }

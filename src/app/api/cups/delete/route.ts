@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { deleteCupSchema } from "@/schemas/cup";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function DELETE(req: Request) {
@@ -9,7 +10,7 @@ export async function DELETE(req: Request) {
     const validation = deleteCupSchema.safeParse(body);
 
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid cup data",
           errors: z.treeifyError(validation.error),
@@ -19,15 +20,16 @@ export async function DELETE(req: Request) {
     }
 
     const { id } = validation.data;
-
     const cup = await db.cup.findUnique({
       where: {
         id,
       },
+      select: {
+        id: true,
+      },
     });
-
     if (!cup) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Cup not found",
         },
@@ -40,14 +42,13 @@ export async function DELETE(req: Request) {
         id,
       },
     });
-
-    return Response.json({
+    return NextResponse.json({
       message: "Cup deleted successfully",
     });
   } catch (err) {
     console.error(err);
 
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Error deleting cup",
       },

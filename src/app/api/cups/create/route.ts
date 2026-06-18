@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { createCupSchema } from "@/schemas/cup";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function POST(req: Request) {
@@ -9,7 +10,7 @@ export async function POST(req: Request) {
     const validation = createCupSchema.safeParse(body);
 
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid cup data",
           errors: z.treeifyError(validation.error),
@@ -17,15 +18,16 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
-
     const existingCup = await db.cup.findFirst({
       where: {
         name: validation.data.name,
       },
+      select: {
+        id: true,
+      },
     });
-
     if (existingCup) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Cup already exists",
         },
@@ -37,14 +39,13 @@ export async function POST(req: Request) {
     const endDate = new Date(validation.data.endDate);
 
     if (endDate < startDate) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "End date cannot be before start date",
         },
         { status: 400 },
       );
     }
-
     const cup = await db.cup.create({
       data: {
         name: validation.data.name,
@@ -58,8 +59,7 @@ export async function POST(req: Request) {
         endDate: true,
       },
     });
-
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Cup created successfully",
         cup,
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error(err);
 
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Error creating cup",
       },

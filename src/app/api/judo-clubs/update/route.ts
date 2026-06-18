@@ -1,15 +1,14 @@
 import { db } from "@/lib/db";
 import { updateJudoClubSchema } from "@/schemas/judoClub";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
-
     const validation = updateJudoClubSchema.safeParse(body);
-
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid JudoClub data",
           errors: z.treeifyError(validation.error),
@@ -19,15 +18,16 @@ export async function PUT(req: Request) {
     }
 
     const { id, name } = validation.data;
-
     const existingClub = await db.judoClub.findUnique({
       where: {
         id,
       },
+      select: {
+        id: true,
+      },
     });
-
     if (!existingClub) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "JudoClub not found",
         },
@@ -43,9 +43,8 @@ export async function PUT(req: Request) {
         },
       },
     });
-
     if (clubWithSameName) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Another JudoClub with this name already exists",
         },
@@ -64,15 +63,13 @@ export async function PUT(req: Request) {
         cups: true,
       },
     });
-
-    return Response.json({
+    return NextResponse.json({
       message: "JudoClub updated successfully",
       club: updatedClub,
     });
   } catch (err) {
     console.error(err);
-
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Error updating JudoClub",
       },

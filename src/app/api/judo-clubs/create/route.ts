@@ -1,15 +1,15 @@
 import { db } from "@/lib/db";
 import { createJudoClubSchema } from "@/schemas/judoClub";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-
     const validation = createJudoClubSchema.safeParse(body);
 
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid JudoClub data",
           errors: z.treeifyError(validation.error),
@@ -19,22 +19,22 @@ export async function POST(req: Request) {
     }
 
     const { name, cupIds } = validation.data;
-
     const existingJudoClub = await db.judoClub.findFirst({
       where: {
         name,
       },
+      select: {
+        id: true,
+      },
     });
-
     if (existingJudoClub) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "JudoClub already exists",
         },
         { status: 409 },
       );
     }
-
     if (cupIds && cupIds.length > 0) {
       const cups = await db.cup.findMany({
         where: {
@@ -43,9 +43,8 @@ export async function POST(req: Request) {
           },
         },
       });
-
       if (cups.length !== cupIds.length) {
-        return Response.json(
+        return NextResponse.json(
           {
             message: "One or more cups were not found",
           },
@@ -53,7 +52,6 @@ export async function POST(req: Request) {
         );
       }
     }
-
     const judoClub = await db.judoClub.create({
       data: {
         name,
@@ -67,8 +65,7 @@ export async function POST(req: Request) {
         cups: true,
       },
     });
-
-    return Response.json(
+    return NextResponse.json(
       {
         message: "JudoClub created successfully",
         judoClub,
@@ -78,7 +75,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error(err);
 
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Error creating JudoClub",
       },

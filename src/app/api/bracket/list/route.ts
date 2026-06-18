@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -8,10 +9,10 @@ export async function GET() {
         teams: true,
       },
     });
-    return Response.json({ message: "OK", brackets });
+    return NextResponse.json({ message: "OK", brackets });
   } catch (err) {
     console.error(err);
-    return Response.json(
+    return NextResponse.json(
       { message: "Error fetching brackets" },
       { status: 500 },
     );

@@ -1,15 +1,14 @@
 import { db } from "@/lib/db";
 import { deleteTeamSchema } from "@/schemas/teams";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function DELETE(req: Request) {
   try {
     const body = await req.json();
-
     const validation = deleteTeamSchema.safeParse(body);
-
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid team data",
           errors: z.treeifyError(validation.error),
@@ -19,7 +18,6 @@ export async function DELETE(req: Request) {
     }
 
     const { id } = validation.data;
-
     const team = await db.team.findUnique({
       where: {
         id,
@@ -30,22 +28,20 @@ export async function DELETE(req: Request) {
         brackets: true,
       },
     });
-
     if (!team) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Team not found",
         },
         { status: 404 },
       );
     }
-
     if (
       team.athletes.length > 0 ||
       team.cups.length > 0 ||
       team.brackets.length > 0
     ) {
-      return Response.json(
+      return NextResponse.json(
         {
           message:
             "Cannot delete a team with associated athletes, cups or brackets",
@@ -58,15 +54,16 @@ export async function DELETE(req: Request) {
       where: {
         id,
       },
+      select: {
+        id: true,
+      },
     });
-
-    return Response.json({
+    return NextResponse.json({
       message: "Team deleted successfully",
     });
   } catch (err) {
     console.error(err);
-
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Error deleting team",
       },

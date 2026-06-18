@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { updateAthleteSchema } from "@/schemas/athlete";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function PUT(req: Request) {
@@ -8,7 +9,7 @@ export async function PUT(req: Request) {
     const validation = updateAthleteSchema.safeParse(body);
 
     if (!validation.success) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "Invalid athlete data",
           errors: z.treeifyError(validation.error),
@@ -16,25 +17,32 @@ export async function PUT(req: Request) {
         { status: 400 },
       );
     }
-    const { id, name, age, weight, teamId } = validation.data;
 
+    const { id, name, age, weight, teamId } = validation.data;
     const existingAthlete = await db.athlete.findUnique({
       where: {
         id,
       },
+      select: {
+        id: true,
+      },
     });
-
     if (!existingAthlete) {
-      return Response.json({ message: "Athlete not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Athlete not found" },
+        { status: 404 },
+      );
     }
     const team = await db.team.findUnique({
       where: {
         id: teamId,
       },
+      select: {
+        id: true,
+      },
     });
-
     if (!team) {
-      return Response.json({ message: "Team not found" }, { status: 404 });
+      return NextResponse.json({ message: "Team not found" }, { status: 404 });
     }
     const athletes = await db.athlete.update({
       where: {
@@ -47,10 +55,10 @@ export async function PUT(req: Request) {
         teamId,
       },
     });
-    return Response.json({ message: "OK", athletes });
+    return NextResponse.json({ message: "OK", athletes });
   } catch (err) {
     console.error(err);
-    return Response.json(
+    return NextResponse.json(
       { message: "Error updating athlete" },
       { status: 500 },
     );
