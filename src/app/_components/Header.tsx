@@ -20,16 +20,12 @@ import {
 import Button from "./Button";
 import CopaSelect from "./CopaSelect";
 import { useEffect, useState } from "react";
+import { getCups } from "@/services/cup";
+import { Cup } from "@/types/cup";
 
 type HeaderProps = {
   activeMenu: "equipes" | "chaves" | "certificados";
   setActiveMenu: (menu: "equipes" | "chaves" | "certificados") => void;
-};
-
-type Cup = {
-  id: string;
-  name: string;
-  endDate: string;
 };
 
 export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
@@ -40,14 +36,16 @@ export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
   const selectedCup = cups.find((cup) => cup.name === selectedCopa);
 
   useEffect(() => {
-    async function getCups() {
-      const response = await fetch("/api/cups");
-      const data = await response.json();
-      setCups(data.cups);
+    async function loadCups() {
+      try {
+        const cups = await getCups();
+        setCups(cups);
+      } catch (error) {
+        console.error("Erro ao buscar copas:", error);
+      }
     }
-    getCups();
+    loadCups();
   }, []);
-  console.log(cups);
 
   return (
     <>
@@ -375,10 +373,10 @@ export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
           <div className="flex items-center gap-2 px-4 pb-4">
             <div className="relative flex-1 min-w-0">
               <CopaSelect
-                  options={cups.map((cup) => ({
-                    value: cup.name,
-                    label: cup.name,
-                  }))}
+                options={cups.map((cup) => ({
+                  value: cup.name,
+                  label: cup.name,
+                }))}
                 placeholder="Selecione uma copa"
                 icon={<Trophy size={14} className="text-amber-400" />}
               />
