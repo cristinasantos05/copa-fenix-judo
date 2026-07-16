@@ -19,28 +19,33 @@ export async function PUT(req: Request) {
     }
 
     const { id, name, age, weight, teamId } = validation.data;
-    const existingAthlete = await db.athlete.findUnique({
-      where: {
-        id,
-      },
-      select: {
-        id: true,
-      },
-    });
+    const [existingAthlete, team] = await Promise.all([
+      db.athlete.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          id: true,
+        },
+      }),
+
+      db.team.findUnique({
+        where: {
+          id: teamId,
+        },
+        select: {
+          id: true,
+        },
+      }),
+    ]);
+
     if (!existingAthlete) {
       return NextResponse.json(
         { message: "Athlete not found" },
         { status: 404 },
       );
     }
-    const team = await db.team.findUnique({
-      where: {
-        id: teamId,
-      },
-      select: {
-        id: true,
-      },
-    });
+
     if (!team) {
       return NextResponse.json({ message: "Team not found" }, { status: 404 });
     }

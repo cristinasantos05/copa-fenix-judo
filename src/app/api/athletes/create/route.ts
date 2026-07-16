@@ -18,14 +18,26 @@ export async function POST(req: Request) {
       );
     }
 
-    const team = await db.team.findUnique({
-      where: {
-        id: validation.data.teamId,
-      },
-      select: {
-        id: true,
-      },
-    });
+    const [team, existingAthlete] = await Promise.all([
+      db.team.findUnique({
+        where: {
+          id: validation.data.teamId,
+        },
+        select: {
+          id: true,
+        },
+      }),
+
+      db.athlete.findFirst({
+        where: {
+          name: validation.data.name,
+          teamId: validation.data.teamId,
+        },
+        select: {
+          id: true,
+        },
+      }),
+    ]);
 
     if (!team) {
       return NextResponse.json(
@@ -35,13 +47,6 @@ export async function POST(req: Request) {
         { status: 404 },
       );
     }
-
-    const existingAthlete = await db.athlete.findFirst({
-      where: {
-        name: validation.data.name,
-        teamId: validation.data.teamId,
-      },
-    });
 
     if (existingAthlete) {
       return NextResponse.json(

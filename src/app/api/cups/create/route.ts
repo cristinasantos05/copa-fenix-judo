@@ -35,22 +35,11 @@ export async function POST(req: Request) {
       );
     }
 
-    const startDate = new Date(validation.data.startDate);
-    const endDate = new Date(validation.data.endDate);
-
-    if (endDate < startDate) {
-      return NextResponse.json(
-        {
-          message: "End date cannot be before start date",
-        },
-        { status: 400 },
-      );
-    }
     const cup = await db.cup.create({
       data: {
         name: validation.data.name,
-        startDate,
-        endDate,
+        startDate: new Date(validation.data.startDate),
+        endDate: new Date(validation.data.endDate),
       },
       select: {
         id: true,

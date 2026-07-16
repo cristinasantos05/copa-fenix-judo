@@ -51,25 +51,14 @@ export async function PUT(req: Request) {
       );
     }
 
-    const parsedStartDate = new Date(startDate);
-    const parsedEndDate = new Date(endDate);
-    if (parsedEndDate < parsedStartDate) {
-      return NextResponse.json(
-        {
-          message: "End date cannot be before start date",
-        },
-        { status: 400 },
-      );
-    }
-
     const updatedCup = await db.cup.update({
       where: {
         id,
       },
       data: {
         name,
-        startDate: parsedStartDate,
-        endDate: parsedEndDate,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
       },
       select: {
         id: true,

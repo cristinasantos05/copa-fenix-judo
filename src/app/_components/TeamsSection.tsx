@@ -4,7 +4,12 @@ import Button from "./Button";
 import { useState } from "react";
 
 export default function TeamsSection() {
-  const [filter, setFilter] = useState("todos");
+  const [filter, setFilter] = useState<"todos" | "masc" | "fem">("todos");
+  const emptyStateMessage = {
+    todos: "Nenhuma equipe cadastrada. Adicione a primeira equipe!",
+    masc: "Nenhuma equipe masculina cadastrada.",
+    fem: "Nenhuma equipe feminina cadastrada.",
+  } as const;
 
   return (
     <section className="px-6 py-6">
@@ -60,12 +65,7 @@ export default function TeamsSection() {
         </div>
       </div>
       <div className="border border-dashed rounded-xl border-white/30 py-12 text-center text-white/60 bg-neutral-900/30">
-        {filter === "todos" &&
-          "Nenhuma equipe cadastrada. Adicione a primeira equipe!"}
-
-        {filter === "masc" && "Nenhuma equipe masculina cadastrada."}
-
-        {filter === "fem" && "Nenhuma equipe feminina cadastrada."}
+        {emptyStateMessage[filter]}
       </div>
     </section>
   );

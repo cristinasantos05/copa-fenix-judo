@@ -18,14 +18,24 @@ export async function PUT(req: Request) {
     }
 
     const { id, cupId } = validation.data;
-    const bracket = await db.bracket.findUnique({
-      where: {
-        id,
-      },
-      select: {
-        id: true,
-      },
-    });
+    const [bracket, cup] = await Promise.all([
+      db.bracket.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          id: true,
+        },
+      }),
+      db.cup.findUnique({
+        where: {
+          id: cupId,
+        },
+        select: {
+          id: true,
+        },
+      }),
+    ]);
     if (!bracket) {
       return NextResponse.json(
         {
@@ -35,14 +45,6 @@ export async function PUT(req: Request) {
       );
     }
 
-    const cup = await db.cup.findUnique({
-      where: {
-        id: cupId,
-      },
-      select: {
-        id: true,
-      },
-    });
     if (!cup) {
       return NextResponse.json(
         {

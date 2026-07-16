@@ -19,25 +19,28 @@ export async function POST(req: Request) {
     }
 
     const { cupId, teamIds } = validation.data;
-    const cup = await db.cup.findUnique({
-      where: {
-        id: cupId,
-      },
-      select: {
-        id: true,
-      },
-    });
+    const [cup, teams] = await Promise.all([
+      db.cup.findUnique({
+        where: {
+          id: cupId,
+        },
+        select: {
+          id: true,
+        },
+      }),
+
+      db.team.findMany({
+        where: {
+          id: {
+            in: teamIds,
+          },
+        },
+      }),
+    ]);
 
     if (!cup) {
       return NextResponse.json({ message: "Cup not found" }, { status: 404 });
     }
-    const teams = await db.team.findMany({
-      where: {
-        id: {
-          in: teamIds,
-        },
-      },
-    });
 
     if (teams.length !== teamIds.length) {
       return NextResponse.json(
