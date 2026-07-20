@@ -8,6 +8,7 @@ type Props = {
   options: Option[];
   value?: string;
   defaultValue?: string;
+  placeholder?: string;
   onChange?: (value: string) => void;
   className?: string;
   icon?: React.ReactNode;
@@ -17,6 +18,7 @@ export default function CopaSelect({
   options,
   value,
   defaultValue,
+  placeholder,
   onChange,
   className = "",
   icon,
@@ -40,7 +42,10 @@ export default function CopaSelect({
   }, []);
 
   const currentValue = value ?? selectedValue;
-  const selected = options.find((o) => o.value === currentValue) ?? options[0];
+  const selected =
+    currentValue && currentValue !== ""
+      ? options.find((o) => o.value === currentValue)
+      : undefined;
 
   function handleSelect(v: string) {
     if (value === undefined) setSelectedValue(v);
@@ -68,7 +73,9 @@ export default function CopaSelect({
       >
         <div className="flex items-center gap-3">
           <div className="pointer-events-none">{icon}</div>
-          <span className="truncate">{selected?.label}</span>
+          <span className="truncate">
+            {selected?.label ?? placeholder ?? options[0]?.label}
+          </span>
         </div>
 
         <ChevronDown size={16} />

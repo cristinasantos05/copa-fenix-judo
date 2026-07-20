@@ -10,16 +10,42 @@ import {
   Trash2,
   Trophy,
 } from "lucide-react";
+import {
+  Show,
+  UserButton,
+  SignInButton,
+  SignUpButton,
+  SignOutButton,
+} from "@clerk/nextjs";
 import Button from "./Button";
 import CopaSelect from "./CopaSelect";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getCups } from "@/services/cup";
+import { Cup } from "@/types/cup";
 
-export default function Header() {
+type HeaderProps = {
+  activeMenu: "equipes" | "chaves" | "certificados";
+  setActiveMenu: (menu: "equipes" | "chaves" | "certificados") => void;
+};
+
+export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
   const [open, setOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState<
-    "equipes" | "chaves" | "certificados"
-  >("equipes");
-  const [selectedCopa, setSelectedCopa] = useState<string>("copa-fenix-2025");
+  const [selectedCopa, setSelectedCopa] = useState("");
+  const [cups, setCups] = useState<Cup[]>([]);
+
+  const selectedCup = cups.find((cup) => cup.name === selectedCopa);
+
+  useEffect(() => {
+    async function loadCups() {
+      try {
+        const cups = await getCups();
+        setCups(cups);
+      } catch (error) {
+        console.error("Erro ao buscar copas:", error);
+      }
+    }
+    loadCups();
+  }, []);
 
   return (
     <>
@@ -41,12 +67,41 @@ export default function Header() {
                 <Flame size={25} className="text-black" />
               </div>
               <div className="leading-tight">
-                <p className="text-xl font-semibold">Copa Fênix 2026</p>
-                <span className="text-xs text-muted-foreground">
-                  01/05/2026
-                </span>
+                <p className="text-xl font-semibold">
+                  {selectedCup?.name ?? "Copa Fênix"}
+                </p>
+                {selectedCup ? (
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(selectedCup.endDate).toLocaleDateString("pt-BR")}
+                  </span>
+                ) : null}
               </div>
             </div>
+          </div>
+
+          <div className="lg:hidden flex items-center gap-2">
+            <Show when="signed-in">
+              <div className="flex items-center gap-2">
+                <UserButton />
+                <SignOutButton redirectUrl="/">
+                  <button className="rounded-lg bg-red-500 px-2 py-1 text-sm text-white cursor-pointer">
+                    Sair
+                  </button>
+                </SignOutButton>
+              </div>
+            </Show>
+            <Show when="signed-out">
+              <SignInButton>
+                <button className="rounded-lg bg-orange-500 hover:bg-orange-600 px-2 py-1 text-sm text-white cursor-pointer">
+                  Entrar
+                </button>
+              </SignInButton>
+              <SignUpButton>
+                <button className="rounded-lg border border-white/20 hover:bg-white/10 px-2 py-1 text-sm text-white cursor-pointer">
+                  Cadastrar
+                </button>
+              </SignUpButton>
+            </Show>
           </div>
 
           <nav className="hidden lg:flex items-center gap-4">
@@ -90,13 +145,13 @@ export default function Header() {
                 </div>
 
                 <CopaSelect
-                  options={[
-                    { value: "copa-fenix-2026", label: "Copa Fênix 2026" },
-                    { value: "copa-fenix-2025", label: "Copa Fênix 2025" },
-                    { value: "copa-fenix-2024", label: "Copa Fênix 2024" },
-                  ]}
+                  options={cups.map((cup) => ({
+                    value: cup.name,
+                    label: cup.name,
+                  }))}
                   value={selectedCopa}
                   onChange={setSelectedCopa}
+                  placeholder=""
                   icon={<Trophy size={16} className="text-orange-400" />}
                 />
               </div>
@@ -107,6 +162,26 @@ export default function Header() {
               <Button className="min-h-10 px-4 rounded-xl flex items-center justify-center">
                 <Trash2 size={17} className="text-red-500" />
               </Button>
+
+              <Show when="signed-in">
+                <div className="flex items-center gap-3 pl-7 border-l border-white/20 ml-2">
+                  <UserButton />
+                </div>
+              </Show>
+              <Show when="signed-out">
+                <div className="flex items-center gap-2 pl-7 border-l border-white/20 ml-2">
+                  <SignInButton>
+                    <button className="rounded-lg bg-orange-500 hover:bg-orange-600 px-2 py-1 text-sm text-white cursor-pointer">
+                      Entrar
+                    </button>
+                  </SignInButton>
+                  <SignUpButton>
+                    <button className="rounded-lg border border-white/20 hover:bg-white/10 px-2 py-1 text-sm text-white cursor-pointer">
+                      Cadastrar
+                    </button>
+                  </SignUpButton>
+                </div>
+              </Show>
             </div>
           </nav>
         </div>
@@ -121,7 +196,7 @@ export default function Header() {
       <aside
         className={`
           fixed left-0 top-0 z-50 h-full w-[80%] max-w-xs
-          bg-neutral-900/70
+          bg-neutral-900
           transform transition-transform duration-300
           ${open ? "translate-x-0" : "-translate-x-full"}
         `}
@@ -296,21 +371,20 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-2 px-4 pb-4">
-            <div className="relative flex-1">
+            <div className="relative flex-1 min-w-0">
               <CopaSelect
-                options={[
-                  { value: "copa-fenix-2026", label: "Copa Fênix 2026" },
-                  { value: "copa-fenix-2025", label: "Copa Fênix 2025" },
-                  { value: "copa-fenix-2024", label: "Copa Fênix 2024" },
-                ]}
-                value={selectedCopa}
-                onChange={setSelectedCopa}
+                options={cups.map((cup) => ({
+                  value: cup.name,
+                  label: cup.name,
+                }))}
+                placeholder="Selecione uma copa"
                 icon={<Trophy size={14} className="text-amber-400" />}
               />
             </div>
 
             <Button
               className="
+                shrink-0
                 border border-white/10
                 rounded-xl
                 text-foreground
@@ -321,7 +395,7 @@ export default function Header() {
               <Plus />
             </Button>
 
-            <Button className="rounded-xl">
+            <Button className="shrink-0 rounded-xl">
               <Trash2 size={16} className="text-red-500" />
             </Button>
           </div>
