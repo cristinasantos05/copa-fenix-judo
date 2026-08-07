@@ -40,6 +40,7 @@ export async function POST(req: Request) {
         name: validation.data.name,
         startDate: new Date(validation.data.startDate),
         endDate: new Date(validation.data.endDate),
+        userId: validation.data.userId,
       },
       select: {
         id: true,

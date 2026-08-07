@@ -20,8 +20,9 @@ import {
 import Button from "./Button";
 import CopaSelect from "./CopaSelect";
 import { useEffect, useState } from "react";
-import { getCups } from "@/services/cup";
+import { getCups, createCup } from "@/services/cup";
 import { Cup } from "@/types/cup";
+import CreateCupModal from "./CreateCupModal";
 
 type HeaderProps = {
   activeMenu: "equipes" | "chaves" | "certificados";
@@ -30,10 +31,11 @@ type HeaderProps = {
 
 export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
   const [open, setOpen] = useState(false);
-  const [selectedCopa, setSelectedCopa] = useState("");
+  const [selectedCupId, setSelectedCupId] = useState<number | null>(null);
   const [cups, setCups] = useState<Cup[]>([]);
+  const [isCreateCupModalOpen, setIsCreateCupModalOpen] = useState(false);
 
-  const selectedCup = cups.find((cup) => cup.name === selectedCopa);
+  const selectedCup = cups.find((cup) => cup.id === selectedCupId);
 
   useEffect(() => {
     async function loadCups() {
@@ -46,6 +48,24 @@ export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
     }
     loadCups();
   }, []);
+
+  async function handleCreateCup(data: {
+    name: string;
+    startDate: string;
+    endDate: string;
+  }) {
+    try {
+      const createdCup = await createCup(data);
+
+      const cups = await getCups();
+      setCups(cups);
+      setSelectedCupId(createdCup.id);
+
+      setIsCreateCupModalOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <>
@@ -91,12 +111,12 @@ export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
               </div>
             </Show>
             <Show when="signed-out">
-              <SignInButton>
+              <SignInButton forceRedirectUrl="/copas">
                 <button className="rounded-lg bg-orange-500 hover:bg-orange-600 px-2 py-1 text-sm text-white cursor-pointer">
                   Entrar
                 </button>
               </SignInButton>
-              <SignUpButton>
+              <SignUpButton forceRedirectUrl="/copas">
                 <button className="rounded-lg border border-white/20 hover:bg-white/10 px-2 py-1 text-sm text-white cursor-pointer">
                   Cadastrar
                 </button>
@@ -146,17 +166,20 @@ export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
 
                 <CopaSelect
                   options={cups.map((cup) => ({
-                    value: cup.name,
+                    value: String(cup.id),
                     label: cup.name,
                   }))}
-                  value={selectedCopa}
-                  onChange={setSelectedCopa}
+                  value={selectedCupId ? String(selectedCupId) : ""}
+                  onChange={(value) => setSelectedCupId(Number(value))}
                   placeholder=""
                   icon={<Trophy size={16} className="text-orange-400" />}
                 />
               </div>
 
-              <Button className="border rounded-xl border-white/20">
+              <Button
+                className="border rounded-xl border-white/20"
+                onClick={() => setIsCreateCupModalOpen(true)}
+              >
                 <Plus />
               </Button>
               <Button className="min-h-10 px-4 rounded-xl flex items-center justify-center">
@@ -170,12 +193,12 @@ export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
               </Show>
               <Show when="signed-out">
                 <div className="flex items-center gap-2 pl-7 border-l border-white/20 ml-2">
-                  <SignInButton>
+                  <SignInButton forceRedirectUrl="/copas">
                     <button className="rounded-lg bg-orange-500 hover:bg-orange-600 px-2 py-1 text-sm text-white cursor-pointer">
                       Entrar
                     </button>
                   </SignInButton>
-                  <SignUpButton>
+                  <SignUpButton forceRedirectUrl="/copas">
                     <button className="rounded-lg border border-white/20 hover:bg-white/10 px-2 py-1 text-sm text-white cursor-pointer">
                       Cadastrar
                     </button>
@@ -401,6 +424,11 @@ export default function Header({ activeMenu, setActiveMenu }: HeaderProps) {
           </div>
         </div>
       </aside>
+      <CreateCupModal
+        open={isCreateCupModalOpen}
+        onClose={() => setIsCreateCupModalOpen(false)}
+        onCreate={handleCreateCup}
+      />
     </>
   );
 }

@@ -6,8 +6,9 @@ export const createCupSchema = z
       .string()
       .min(1, "Name is required")
       .max(255, "Name must be less than 255 characters"),
-    startDate: z.string().datetime(),
-    endDate: z.string().datetime(),
+    startDate: z.string().date(),
+    endDate: z.string().date(),
+    userId: z.string().min(1, "userId is required"),
   })
   .refine((data) => new Date(data.endDate) >= new Date(data.startDate), {
     message: "End date cannot be before start date",
@@ -25,8 +26,8 @@ export const updateCupSchema = z
       .string()
       .min(1, "Name is required")
       .max(255, "Name must be less than 255 characters"),
-    startDate: z.string().datetime(),
-    endDate: z.string().datetime(),
+    startDate: z.string().date(),
+    endDate: z.string().date(),
   })
   .refine((data) => new Date(data.endDate) >= new Date(data.startDate), {
     message: "End date cannot be before start date",
