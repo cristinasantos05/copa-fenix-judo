@@ -8,12 +8,13 @@ datasource db {
 }
 
 model User { 
-  id    Int     @id @default(autoincrement()) 
+  id    String @id
   email String  @unique
   name  String?
-  password String
+  password String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  cups Cup[]
 } 
 
 model Cup {
@@ -26,6 +27,8 @@ model Cup {
   teams Team[] 
   judoClubs JudoClub[]
   brackets Bracket[]
+  userId String
+  user User @relation(fields: [userId], references: [id])
 }
 
 model JudoClub {
